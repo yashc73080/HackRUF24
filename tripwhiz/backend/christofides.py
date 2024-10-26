@@ -2,10 +2,14 @@
 import googlemaps       # For accessing Google Maps API
 import itertools        # For working with pairs of items in lists
 import networkx as nx   # For graph-related operations like MST and matching
+from dotenv import load_dotenv
+import os
+
+load_dotenv('../.env.local')
 
 # Initialize the Google Maps client with your API key
-API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'  # Replace with your actual Google Maps API key
-gmaps = googlemaps.Client(key=API_KEY)  # Create a client to interact with Google Maps
+GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')  # Replace with your actual Google Maps API key
+gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)  # Create a client to interact with Google Maps
 
 # Function to get the travel distance between two locations using Google Maps
 def get_travel_distance(origin, destination):
