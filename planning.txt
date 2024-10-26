@@ -1,0 +1,12 @@
+user input of location
+
+mode of transportation
+cheapest travel (fuel, $, etc)
+
+mongo to remember trip history 
+
+create fully connected graph, with each destination being a node
+this is a Traveling Salesman Problem (TSP) since every node must be visited but it must be done in an optimal way
+use Christofides Algorithm with Google Maps API
+
+probably long compute time so they can play some mini game while waiting
