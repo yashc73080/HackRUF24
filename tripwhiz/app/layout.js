@@ -14,7 +14,7 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "TripWhiz",
-  description: "Smart travel planning for everyone",
+  description: "Optimize your next adventure",
 };
 
 export default function RootLayout({ children }) {
