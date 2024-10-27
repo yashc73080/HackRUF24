@@ -8,7 +8,7 @@ import os
 load_dotenv('../.env.local')
 
 # Initialize the Google Maps client with your API key
-GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
+GOOGLE_MAPS_API_KEY = os.getenv('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY')
 gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 # Function to get the travel distance between two locations using Google Maps
