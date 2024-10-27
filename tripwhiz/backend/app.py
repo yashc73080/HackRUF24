@@ -2,13 +2,14 @@ from flask import Flask, request, jsonify
 import googlemaps
 from dotenv import load_dotenv
 import os
+import requests
 from christofides import tsp  # Import the tsp function from christofides.py
 
 # Load environment variables from a .env file
-load_dotenv()
+load_dotenv('../.env.local')
 
 # Initialize the Google Maps client with your API key
-GOOGLE_MAPS_API_KEY = "AIzaSyBhshU5_ZWwS7dcHL8aR8B5l6FDNHEDyEk"
+GOOGLE_MAPS_API_KEY = os.getenv('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY')
 gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 app = Flask(__name__)
@@ -19,7 +20,13 @@ def home():
 
 @app.route('/tsp', methods=['POST'])
 def tsp_route():
-    data = request.get_json()
+    # Fetch data from the specified server
+    response = requests.get('http://localhost:5000/submit-itinerary')
+    
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch data from the server."}), 500
+
+    data = response.json()
 
     locations = data.get("locations", [])
     

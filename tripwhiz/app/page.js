@@ -14,14 +14,12 @@ export default function Page() {
   const locationsListRef = useRef(null);
 
   useEffect(() => {
-    // Scroll to bottom when new location is added
     if (locationsListRef.current) {
       locationsListRef.current.scrollTop = locationsListRef.current.scrollHeight;
     }
   }, [selectedLocations]);
 
   useEffect(() => {
-    // Load Google Maps JavaScript API
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
     script.async = true;
@@ -76,7 +74,7 @@ export default function Page() {
         title: place.name,
         animation: window.google.maps.Animation.DROP,
       });
-      
+
       setCurrentMarker(newMarker);
 
       if (place.geometry.viewport) {
@@ -103,7 +101,7 @@ export default function Page() {
       setSelectedLocations([...selectedLocations, { ...currentPlace, marker }]);
       document.getElementById('pac-input').value = '';
       setCurrentPlace(null);
-      
+
       if (currentMarker) {
         currentMarker.setMap(null);
         setCurrentMarker(null);
@@ -116,33 +114,42 @@ export default function Page() {
     if (locationToRemove.marker) {
       locationToRemove.marker.setMap(null);
     }
-    
+
     const newLocations = selectedLocations.filter((_, i) => i !== index);
     setSelectedLocations(newLocations);
   };
 
+  // Submit itinerary function
   const submitItinerary = async () => {
+    if (selectedLocations.length === 0) {
+      alert("No locations to submit.");
+      return;
+    }
+
+    const itineraryData = selectedLocations.map(location => ({
+      name: location.name,
+      lat: location.lat,
+      lng: location.lng
+    }));
+
     try {
       const response = await fetch('http://localhost:5000/submit-itinerary', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(
-          selectedLocations.map(location => ({
-            name: location.name,
-            lat: location.lat,
-            lng: location.lng,
-          }))
-        ),
+        body: JSON.stringify({ locations: itineraryData }),
       });
+
       if (response.ok) {
-        console.log('Itinerary submitted successfully');
+        alert('Itinerary submitted successfully!');
+        setSelectedLocations([]); // Optionally clear the itinerary after submission
       } else {
-        console.error('Failed to submit itinerary');
+        alert('Failed to submit itinerary.');
       }
     } catch (error) {
       console.error('Error submitting itinerary:', error);
+      alert('Error submitting itinerary.');
     }
   };
 
@@ -187,7 +194,7 @@ export default function Page() {
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-gray-200 text-lg font-semibold">Selected Locations</h2>
               <button
-                onClick={submitItinerary}
+                onClick={submitItinerary} // Hooking up submitItinerary function to the button
                 className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
               >
                 Submit Itinerary
@@ -239,7 +246,6 @@ export default function Page() {
             ) : (
               <div>
                 <p className="text-gray-300 text-sm">Total Locations: {selectedLocations.length}</p>
-                <p className="text-gray-400 text-xs mt-2">Optimization features coming soon...</p>
               </div>
             )}
           </div>
