@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import ChatInterface from './components/ChatInterface';
 
 export default function Page() {
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -120,6 +121,31 @@ export default function Page() {
     setSelectedLocations(newLocations);
   };
 
+  const submitItinerary = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/submit-itinerary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          selectedLocations.map(location => ({
+            name: location.name,
+            lat: location.lat,
+            lng: location.lng,
+          }))
+        ),
+      });
+      if (response.ok) {
+        console.log('Itinerary submitted successfully');
+      } else {
+        console.error('Failed to submit itinerary');
+      }
+    } catch (error) {
+      console.error('Error submitting itinerary:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-800 p-4">
       <div className="grid grid-cols-12 gap-4 max-w-[1920px] mx-auto">
@@ -130,7 +156,7 @@ export default function Page() {
             <div className="flex gap-2 mb-4">
               <input
                 id="pac-input"
-                className="flex-1 p-2 rounded border border-gray-300 text-gray-900"
+                className="flex-1 p-2 rounded border border-gray-500 bg-gray-700 text-gray-100"
                 type="text"
                 placeholder="Search for a location"
               />
@@ -157,8 +183,16 @@ export default function Page() {
         {/* Right Side Sections - 6 columns */}
         <div className="col-span-6 flex flex-col gap-4">
           {/* Selected Locations - Scrollable */}
-          <div className="bg-gray-700 rounded-lg p-4 shadow-lg h-[350px] flex flex-col">
-            <h2 className="text-gray-200 text-lg font-semibold mb-3">Selected Locations</h2>
+          <div className="bg-gray-700 rounded-lg p-4 shadow-lg h-[300px] flex flex-col">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-gray-200 text-lg font-semibold">Selected Locations</h2>
+              <button
+                onClick={submitItinerary}
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+              >
+                Submit Itinerary
+              </button>
+            </div>
             <div 
               ref={locationsListRef}
               className="flex-1 overflow-y-auto pr-2 space-y-2"
@@ -190,9 +224,11 @@ export default function Page() {
           </div>
 
           {/* Chat Interface Space */}
-          <div className="bg-gray-700 rounded-lg p-4 shadow-lg h-[300px]">
-            <h2 className="text-gray-200 text-lg font-semibold mb-3">Chat Interface</h2>
-            <p className="text-gray-400 text-sm">Chat interface will be implemented here</p>
+          <div className="bg-gray-700 rounded-lg p-4 shadow-lg flex flex-col h-[350px]">
+            <h2 className="text-gray-200 text-lg font-semibold mb-3">Travel Assistant</h2>
+            <div className="flex-1 overflow-hidden"> {/* Added container */}
+              <ChatInterface selectedLocations={selectedLocations} />
+            </div>
           </div>
 
           {/* Final Itinerary */}
