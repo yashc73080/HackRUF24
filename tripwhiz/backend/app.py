@@ -1,9 +1,19 @@
 from flask import Flask, request, jsonify
+import googlemaps
+from dotenv import load_dotenv
+import os
 from christofides import tsp  # Import the tsp function from christofides.py
+
+# Load environment variables from a .env file
+load_dotenv()
+
+# Initialize the Google Maps client with your API key
+GOOGLE_MAPS_API_KEY = "AIzaSyBhshU5_ZWwS7dcHL8aR8B5l6FDNHEDyEk"
+gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 app = Flask(__name__)
 
-@app.route('/')  # Root route
+@app.route('/')
 def home():
     return "Welcome to the TSP API! Use the /tsp endpoint to calculate routes."
 
