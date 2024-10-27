@@ -55,13 +55,15 @@ def find_odd_degree_nodes(mst):
     return [node for node, degree in mst.degree() if degree % 2 == 1]
 
 # Function to create minimum weight perfect matching for odd degree nodes
+# Function to create minimum weight perfect matching for odd degree nodes
 def minimum_weight_perfect_matching(odd_nodes, graph):
     G = nx.Graph()
     for u, v in itertools.combinations(odd_nodes, 2):
-        if (u, v) in graph:  # Ensure the edge exists
-            G.add_edge(u, v, weight=graph[(u, v)])
-    matching = nx.algorithms.matching.min_weight_matching(G, maxcardinality=True)
+        if v in graph[u]:  # Ensure the edge exists in the original graph
+            G.add_edge(u, v, weight=graph[u][v])
+    matching = nx.algorithms.matching.min_weight_matching(G)  # Removed maxcardinality=True
     return matching
+
 
 # Combine the MST and matching to form an Eulerian circuit
 def make_eulerian_circuit(mst, matching, graph):
