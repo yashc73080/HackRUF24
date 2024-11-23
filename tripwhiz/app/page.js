@@ -119,6 +119,32 @@ export default function Page() {
 
     const newLocations = selectedLocations.filter((_, i) => i !== index);
     setSelectedLocations(newLocations);
+
+    // Clear the optimized route when locations are modified
+    setOptimizedRoute(null);
+    if (routePolyline) {
+      routePolyline.setMap(null);
+      setRoutePolyline(null);
+    }
+  };
+
+  const clearAllLocations = () => {
+    // Clear all markers from the map
+    selectedLocations.forEach(location => {
+      if (location.marker) {
+        location.marker.setMap(null);
+      }
+    });
+
+    // Clear the optimized route
+    if (routePolyline) {
+      routePolyline.setMap(null);
+      setRoutePolyline(null);
+    }
+
+    // Reset states
+    setSelectedLocations([]);
+    setOptimizedRoute(null);
   };
 
   // Submit itinerary function
@@ -225,12 +251,21 @@ export default function Page() {
           <div className="bg-gray-700 rounded-lg p-4 shadow-lg h-[300px] flex flex-col">
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-gray-200 text-lg font-semibold">Selected Locations</h2>
-              <button
-                onClick={submitItinerary} // Hooking up submitItinerary function to the button
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
-              >
-                Submit Itinerary
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={clearAllLocations}
+                  className="px-4 py-2 hover:bg-gray-600/50 text-red-500 hover:text-red-400 rounded flex items-center transition-colors"
+                  title="Clear all locations"
+                >
+                  <i className="fas fa-trash-alt text-lg"></i>
+                </button>
+                <button
+                  onClick={submitItinerary}
+                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+                >
+                  Submit Itinerary
+                </button>
+              </div>
             </div>
             <div
               ref={locationsListRef}
@@ -282,7 +317,7 @@ export default function Page() {
                   {optimizedRoute.map((index, i) => (
                     <div key={i} className="text-gray-200 text-sm flex items-center">
                       <span className="mr-2">{i + 1}.</span>
-                      <span>{selectedLocations[index].name}</span>
+                      <span>{selectedLocations[index]?.name || 'Location removed'}</span>
                     </div>
                   ))}
                 </div>
