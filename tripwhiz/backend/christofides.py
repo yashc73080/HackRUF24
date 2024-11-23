@@ -5,10 +5,14 @@ from dotenv import load_dotenv
 import os
 
 # Load environment variables from a .env file
-load_dotenv('../.env.local')
+env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env.local')
+load_dotenv(env_path)
 
 # Initialize the Google Maps client with your API key
 GOOGLE_MAPS_API_KEY = os.getenv('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY')
+if not GOOGLE_MAPS_API_KEY:
+    raise ValueError("Google Maps API key not found in .env.local file")
+
 gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 # Function to get the travel distance between two locations using Google Maps

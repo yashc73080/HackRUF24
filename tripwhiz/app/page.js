@@ -11,6 +11,8 @@ export default function Page() {
   const [map, setMap] = useState(null);
   const [searchBox, setSearchBox] = useState(null);
   const [currentMarker, setCurrentMarker] = useState(null);
+  const [optimizedRoute, setOptimizedRoute] = useState(null);
+  const [routePolyline, setRoutePolyline] = useState(null);
   const locationsListRef = useRef(null);
 
   useEffect(() => {
@@ -142,8 +144,38 @@ export default function Page() {
       });
 
       if (response.ok) {
-        alert('Itinerary submitted successfully!');
-        setSelectedLocations([]); // Optionally clear the itinerary after submission
+        const data = await response.json();
+        setOptimizedRoute(data.optimized_route);
+
+        // Clear existing polyline
+        if (routePolyline) {
+          routePolyline.setMap(null);
+        }
+
+        // Draw the new route on the map
+        const routeCoordinates = data.optimized_route.map(index => ({
+          lat: selectedLocations[index].lat,
+          lng: selectedLocations[index].lng
+        }));
+
+        // Add the first location again to complete the circuit
+        routeCoordinates.push(routeCoordinates[0]);
+
+        const newPolyline = new window.google.maps.Polyline({
+          path: routeCoordinates,
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 2,
+          map: map
+        });
+
+        setRoutePolyline(newPolyline);
+
+        // Fit the map bounds to show the entire route
+        const bounds = new window.google.maps.LatLngBounds();
+        routeCoordinates.forEach(coord => bounds.extend(coord));
+        map.fitBounds(bounds);
       } else {
         alert('Failed to submit itinerary.');
       }
@@ -179,8 +211,8 @@ export default function Page() {
                 Add
               </button>
             </div>
-            <div 
-              id="map" 
+            <div
+              id="map"
               className="rounded-lg"
               style={{ height: '600px', width: '100%' }}
             />
@@ -200,7 +232,7 @@ export default function Page() {
                 Submit Itinerary
               </button>
             </div>
-            <div 
+            <div
               ref={locationsListRef}
               className="flex-1 overflow-y-auto pr-2 space-y-2"
             >
@@ -243,9 +275,22 @@ export default function Page() {
             <h2 className="text-gray-200 text-lg font-semibold mb-3">Optimized Itinerary</h2>
             {selectedLocations.length === 0 ? (
               <p className="text-gray-400 text-sm">Add locations to generate an optimized route</p>
+            ) : optimizedRoute ? (
+              <div className="space-y-2">
+                <p className="text-gray-300 text-sm">Total Locations: {selectedLocations.length}</p>
+                <div className="space-y-1">
+                  {optimizedRoute.map((index, i) => (
+                    <div key={i} className="text-gray-200 text-sm flex items-center">
+                      <span className="mr-2">{i + 1}.</span>
+                      <span>{selectedLocations[index].name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : (
               <div>
                 <p className="text-gray-300 text-sm">Total Locations: {selectedLocations.length}</p>
+                <p className="text-gray-400 text-sm">Click "Submit Itinerary" to optimize route</p>
               </div>
             )}
           </div>
