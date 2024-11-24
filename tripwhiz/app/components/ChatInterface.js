@@ -33,6 +33,13 @@ export default function ChatInterface({ selectedLocations }) {
         ]),
       });
 
+      // Improved error handling
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API response error:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+
       if (!response.body) throw new Error('No response body');
 
       const reader = response.body.getReader();
@@ -57,10 +64,10 @@ export default function ChatInterface({ selectedLocations }) {
         });
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Detailed Error:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Sorry, there was an error processing your request.'
+        content: `Sorry, there was an error processing your request. Details: ${error.message}`
       }]);
     } finally {
       setIsLoading(false);

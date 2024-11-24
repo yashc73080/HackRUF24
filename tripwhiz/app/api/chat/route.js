@@ -37,7 +37,13 @@ const openai = new OpenAI({
 
 async function geocodeLocations(locations) {
   try {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/geocode`, { locations });
+    // Dynamically determine backend URL
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 
+      (typeof window !== 'undefined' ? 
+        `${window.location.protocol}//${window.location.host}` : 
+        'http://localhost:5000');
+    
+    const response = await axios.post(`${backendUrl}/geocode`, { locations });
     return response.data.geocoded_locations;
   } catch (error) {
     console.error('Geocoding error:', error);
@@ -47,7 +53,13 @@ async function geocodeLocations(locations) {
 
 async function optimizeRoute(locations) {
   try {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/optimize_route`, { locations });
+    // Dynamically determine backend URL
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 
+      (typeof window !== 'undefined' ? 
+        `${window.location.protocol}//${window.location.host}` : 
+        'http://localhost:5000');
+    
+    const response = await axios.post(`${backendUrl}/optimize_route`, { locations });
     return response.data;
   } catch (error) {
     console.error('Route optimization error:', error);
