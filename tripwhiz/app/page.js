@@ -325,7 +325,7 @@ export default function Page() {
             ) : (
               <div>
                 <p className="text-gray-300 text-sm">Total Locations: {selectedLocations.length}</p>
-                <p className="text-gray-400 text-sm">Click "Submit Itinerary" to optimize route</p>
+                <p className="text-gray-400 text-sm">Click &quot;Submit Itinerary&quot; to optimize route</p>
               </div>
             )}
           </div>
