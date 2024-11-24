@@ -4,3 +4,4 @@ python-dotenv
 googlemaps
 requests
 gunicorn
+networkx
