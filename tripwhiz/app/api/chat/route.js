@@ -1,23 +1,33 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import axios from 'axios';
 
 const systemPrompt = `
-You are TripWhiz, an AI travel assistant helping users plan their trips and discover destinations. Your role is to:
-1. Provide detailed recommendations for attractions, activities, restaurants, and experiences
-2. Give practical travel tips and local insights
-3. Consider the context of the user's selected locations in their itinerary
-4. Keep responses concise but informative, focusing on specific recommendations
-5. Include operating hours, costs, and practical details when relevant
+You are TripWhiz, an AI travel assistant with advanced action-taking capabilities. Your primary goal is to help users plan and execute their travel itineraries seamlessly.
 
-For example:
-User: "What should I do in Central Park?"
-Response: "Central Park offers several must-see attractions:
-- Bethesda Fountain & Terrace: Beautiful architecture and people-watching
-- The Mall & Literary Walk: Historic promenade lined with elm trees
-- Belvedere Castle: Great views of the park (open 10am-5pm)
-- Sheep Meadow: Perfect for picnics on sunny days
-- Central Park Zoo: Family-friendly attraction ($20 adult admission)
-I recommend starting at the south entrance and walking north through the Mall."
+Action-Taking Guidelines:
+1. When a user requests route planning or location-based actions, break down the task into specific steps
+2. Identify locations mentioned in the request
+3. Use available backend functions to:
+   - Geocode locations
+   - Optimize travel routes
+   - Add locations to the user's map
+   - Generate a comprehensive travel itinerary
+
+Action Detection:
+- Look for keywords like "route", "plan", "travel", "visit", "go to"
+- Recognize lists of locations or travel destinations
+- Understand user intent for trip planning
+
+Example Actions:
+User: "I want to go to empire state, willis tower, and golden gate bridge. Plan the best route for me."
+Action Steps:
+1. Geocode locations
+2. Calculate optimal route
+3. Add locations to map
+4. Generate route summary with distances and estimated travel time
+
+Always provide a clear, actionable response that helps the user understand the next steps in their travel planning.
 `;
 
 const openai = new OpenAI({
@@ -25,10 +35,89 @@ const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
+async function geocodeLocations(locations) {
+  try {
+    const response = await axios.post('http://localhost:5000/geocode', { locations });
+    return response.data.geocoded_locations;
+  } catch (error) {
+    console.error('Geocoding error:', error);
+    return null;
+  }
+}
+
+async function optimizeRoute(locations) {
+  try {
+    const response = await axios.post('http://localhost:5000/optimize_route', { locations });
+    return response.data;
+  } catch (error) {
+    console.error('Route optimization error:', error);
+    return null;
+  }
+}
+
 export async function POST(req) {
   const data = await req.json();
+  const lastMessage = data[data.length - 1];
 
-  const completion = await openai.chat.completions.create({
+  // Check if the message requires action-taking
+  const actionCompletion = await openai.chat.completions.create({
+    model: "meta-llama/llama-3.1-8b-instruct:free",
+    messages: [
+      { role: 'system', content: systemPrompt },
+      ...data,
+      { 
+        role: 'user', 
+        content: 'Analyze the previous message and determine if it requires location-based actions. If so, extract the list of locations and confirm the action steps.' 
+      }
+    ],
+    max_tokens: 300
+  });
+
+  const actionAnalysis = actionCompletion.choices[0].message.content;
+  
+  // If action is detected, process the locations
+  if (actionAnalysis.toLowerCase().includes('action required')) {
+    const locations = actionAnalysis.match(/Locations:\s*(.+)/)?.[1].split(',').map(loc => loc.trim());
+    
+    if (locations && locations.length > 0) {
+      const geocodedLocations = await geocodeLocations(locations);
+      const optimizedRoute = await optimizeRoute(geocodedLocations);
+
+      // Prepare detailed response with route details
+      const routeResponse = `I've planned your route for the following locations:
+${optimizedRoute.route.map((loc, index) => `${index + 1}. ${loc.name}`).join('\n')}
+
+Total Distance: ${optimizedRoute.total_distance} miles
+Estimated Travel Time: ${optimizedRoute.total_time}
+
+Would you like me to add these locations to your map and generate a detailed itinerary?`;
+
+      return NextResponse.json({ 
+        type: 'route_plan',
+        message: routeResponse,
+        locations: optimizedRoute.route.map(loc => ({
+          name: loc.name,
+          lat: loc.lat,
+          lng: loc.lng
+        })),
+        itinerary: {
+          totalDistance: optimizedRoute.total_distance,
+          totalTime: optimizedRoute.total_time,
+          stops: optimizedRoute.route.map((loc, index) => ({
+            order: index + 1,
+            name: loc.name,
+            coordinates: {
+              lat: loc.lat,
+              lng: loc.lng
+            }
+          }))
+        }
+      });
+    }
+  }
+
+  // Default chat completion if no action is required
+  const chatCompletion = await openai.chat.completions.create({
     model: "meta-llama/llama-3.1-8b-instruct:free",
     messages: [{ role: 'system', content: systemPrompt }, ...data],
     stream: true,
@@ -38,7 +127,7 @@ export async function POST(req) {
     async start(controller) {
       const encoder = new TextEncoder();
       try {
-        for await (const chunk of completion) {
+        for await (const chunk of chatCompletion) {
           const content = chunk.choices[0]?.delta?.content;
           if (content) {
             controller.enqueue(encoder.encode(content));
