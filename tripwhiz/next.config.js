@@ -5,7 +5,7 @@ const nextConfig = {
     unoptimized: true  // Disable image optimization for static export
   },
   env: {
-    NEXT_PUBLIC_BACKEND_URL: process.env.BACKEND_URL || 'https://your-backend-service.onrender.com'
+    NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL || 'https://hackruf24.onrender.com'
   }
 };
 

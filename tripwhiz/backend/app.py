@@ -17,7 +17,7 @@ if not GOOGLE_MAPS_API_KEY:
 gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": ["https://tripwhiz-frontend.onrender.com", "http://localhost:3000"]}})  # Enable CORS for all routes
 
 @app.route('/')
 def home():

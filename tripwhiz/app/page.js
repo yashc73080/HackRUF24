@@ -161,7 +161,7 @@ export default function Page() {
     }));
 
     try {
-      const response = await fetch('http://localhost:5000/submit-itinerary', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/submit-itinerary`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
