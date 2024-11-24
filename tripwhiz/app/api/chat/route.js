@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import axios from 'axios';
 
 const systemPrompt = `
-You are TripWhiz, an AI travel assistant with advanced action-taking capabilities. Your primary goal is to help users plan and execute their travel itineraries seamlessly.
+You are TripWhiz AI, an AI travel assistant with advanced action-taking capabilities. Your primary goal is to help users plan and execute their travel itineraries seamlessly.
 
 Action-Taking Guidelines:
 1. When a user requests route planning or location-based actions, break down the task into specific steps
@@ -37,7 +37,7 @@ const openai = new OpenAI({
 
 async function geocodeLocations(locations) {
   try {
-    const response = await axios.post('http://localhost:5000/geocode', { locations });
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/geocode`, { locations });
     return response.data.geocoded_locations;
   } catch (error) {
     console.error('Geocoding error:', error);
@@ -47,7 +47,7 @@ async function geocodeLocations(locations) {
 
 async function optimizeRoute(locations) {
   try {
-    const response = await axios.post('http://localhost:5000/optimize_route', { locations });
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/optimize_route`, { locations });
     return response.data;
   } catch (error) {
     console.error('Route optimization error:', error);

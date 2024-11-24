@@ -299,7 +299,7 @@ export default function Page() {
 
           {/* Chat Interface Space */}
           <div className="bg-gray-700 rounded-lg p-4 shadow-lg flex flex-col h-[350px]">
-            <h2 className="text-gray-200 text-lg font-semibold mb-3">Travel Assistant</h2>
+            <h2 className="text-gray-200 text-lg font-semibold mb-3">TripWhiz AI</h2>
             <div className="flex-1 overflow-hidden"> {/* Added container */}
               <ChatInterface selectedLocations={selectedLocations} />
             </div>
