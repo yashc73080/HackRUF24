@@ -14,6 +14,7 @@ export default function Page() {
   const [optimizedRoute, setOptimizedRoute] = useState(null);
   const [routePolyline, setRoutePolyline] = useState(null);
   const locationsListRef = useRef(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (locationsListRef.current) {
@@ -154,6 +155,8 @@ export default function Page() {
       return;
     }
 
+    setIsSubmitting(true);
+
     const itineraryData = selectedLocations.map(location => ({
       name: location.name,
       lat: location.lat,
@@ -173,18 +176,15 @@ export default function Page() {
         const data = await response.json();
         setOptimizedRoute(data.optimized_route);
 
-        // Clear existing polyline
         if (routePolyline) {
           routePolyline.setMap(null);
         }
 
-        // Draw the new route on the map
         const routeCoordinates = data.optimized_route.map(index => ({
           lat: selectedLocations[index].lat,
           lng: selectedLocations[index].lng
         }));
 
-        // Add the first location again to complete the circuit
         routeCoordinates.push(routeCoordinates[0]);
 
         const newPolyline = new window.google.maps.Polyline({
@@ -198,7 +198,6 @@ export default function Page() {
 
         setRoutePolyline(newPolyline);
 
-        // Fit the map bounds to show the entire route
         const bounds = new window.google.maps.LatLngBounds();
         routeCoordinates.forEach(coord => bounds.extend(coord));
         map.fitBounds(bounds);
@@ -208,6 +207,8 @@ export default function Page() {
     } catch (error) {
       console.error('Error submitting itinerary:', error);
       alert('Error submitting itinerary.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -261,9 +262,38 @@ export default function Page() {
                 </button>
                 <button
                   onClick={submitItinerary}
-                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+                  disabled={isSubmitting}
+                  className={`px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded flex items-center gap-2 ${
+                    isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Submit Itinerary
+                  {isSubmitting ? (
+                    <>
+                      <svg 
+                        className="animate-spin h-5 w-5 text-white" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        fill="none" 
+                        viewBox="0 0 24 24"
+                      >
+                        <circle 
+                          className="opacity-25" 
+                          cx="12" 
+                          cy="12" 
+                          r="10" 
+                          stroke="currentColor" 
+                          strokeWidth="4"
+                        />
+                        <path 
+                          className="opacity-75" 
+                          fill="currentColor" 
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    'Submit Itinerary'
+                  )}
                 </button>
               </div>
             </div>
