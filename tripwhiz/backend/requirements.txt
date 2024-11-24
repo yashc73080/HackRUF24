@@ -5,3 +5,4 @@ googlemaps
 requests
 gunicorn
 networkx
+openai
