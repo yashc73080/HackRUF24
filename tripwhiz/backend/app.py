@@ -1,13 +1,21 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import googlemaps
 from dotenv import load_dotenv
 import os
 from christofides import tsp
+from openai import OpenAI
+import json
 
 # Load environment variables from a .env file
 env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env.local')
 load_dotenv(env_path)
+
+# Initialize OpenAI client
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv('OPENROUTER_API_KEY')
+)
 
 # Initialize the Google Maps client with your API key
 GOOGLE_MAPS_API_KEY = os.getenv('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY')
@@ -130,6 +138,39 @@ def optimize_route():
         'total_distance': round(total_distance, 1),
         'total_time': total_time
     })
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    try:
+        messages = request.json
+        
+        # System message for context
+        system_message = {
+            "role": "system",
+            "content": """You are TripWhiz AI, an AI travel assistant with advanced action-taking capabilities. 
+            Your primary goal is to help users plan and execute their travel itineraries seamlessly."""
+        }
+        
+        # Add system message at the beginning
+        messages.insert(0, system_message)
+        
+        # Create chat completion with new API format
+        response = client.chat.completions.create(
+            model="meta-llama/llama-3.1-8b-instruct:free",
+            messages=messages,
+            stream=True
+        )
+        
+        def generate():
+            for chunk in response:
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
+        
+        return Response(generate(), mimetype='text/event-stream')
+    
+    except Exception as e:
+        print(f"Chat error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 def get_travel_distance(origin, destination):
     """Get the driving distance between two locations."""

@@ -24,23 +24,24 @@ export default function ChatInterface({ selectedLocations }) {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${backendUrl}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream',
+        },
         body: JSON.stringify([
           ...messages,
           userMessage
         ]),
       });
 
-      // Improved error handling
       if (!response.ok) {
         const errorText = await response.text();
         console.error('API response error:', errorText);
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
-
-      if (!response.body) throw new Error('No response body');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -56,9 +57,9 @@ export default function ChatInterface({ selectedLocations }) {
         setMessages(prev => {
           const newMessages = [...prev];
           if (newMessages[newMessages.length - 1].role === 'assistant') {
-            newMessages[newMessages.length - 1] = assistantMessage;
+            newMessages[newMessages.length - 1] = { ...assistantMessage };
           } else {
-            newMessages.push(assistantMessage);
+            newMessages.push({ ...assistantMessage });
           }
           return newMessages;
         });
