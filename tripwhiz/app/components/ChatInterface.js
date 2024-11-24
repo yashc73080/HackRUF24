@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export default function ChatInterface({ selectedLocations }) {
   const [messages, setMessages] = useState([]);
@@ -96,7 +97,9 @@ export default function ChatInterface({ selectedLocations }) {
                   : 'bg-gray-600 text-gray-200'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              <ReactMarkdown className="text-sm whitespace-pre-wrap">
+                {message.content}
+              </ReactMarkdown>
             </div>
           </div>
         ))}
