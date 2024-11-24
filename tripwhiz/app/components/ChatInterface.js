@@ -25,6 +25,7 @@ export default function ChatInterface({ selectedLocations }) {
 
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+      console.log('Using backend URL:', backendUrl); // Add logging for debugging
       const response = await fetch(`${backendUrl}/chat`, {
         method: 'POST',
         headers: { 

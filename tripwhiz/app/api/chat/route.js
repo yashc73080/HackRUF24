@@ -1,3 +1,5 @@
+// NOT BEING USED ANYMORE
+
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import axios from 'axios';
