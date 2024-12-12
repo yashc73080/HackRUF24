@@ -1,5 +1,37 @@
 # HACKRUF24 - TripWhiz
 
+## How to Run
+
+Setup repository:
+```bash
+git clone git clone https://github.com/yashc73080/TripWiz.git
+cd TripWiz/tripwiz
+```
+
+Setup the backend (will use the ```tripwiz/backend``` directory):
+```bash
+cd backend
+conda create --name tripwiz python=3.11
+conda activate tripwiz
+pip install -r requirements.txt
+```
+
+
+Setup the frontend (will use the ```tripwiz``` directory):
+```bash
+npm install
+```
+
+Start the backend (in ```tripwiz/backend``` directory):
+```bash
+python app.py
+```
+
+Start the frontend (in ```tripwiz``` directory):
+```bash
+npm run dev
+```
+
 ## About the Project
 Our journey to creating TripWhiz began with a simple yet relatable problem. One day, our group members struggled to coordinate a beach trip that involved multiple stops. We realized how challenging it was to optimize our route and manage our time efficiently for multiple destinations. This sparked an idea: wouldn’t it be great to have an itinerary planner that could streamline our travels and help us visit multiple places without too much trouble? So, the idea of TripWhiz was born.
 
