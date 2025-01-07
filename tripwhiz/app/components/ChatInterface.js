@@ -26,7 +26,7 @@ export default function ChatInterface({ selectedLocations }) {
 
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-      console.log('Using backend URL:', backendUrl); // Add logging for debugging
+      console.log('Using backend URL:', backendUrl);
       const response = await fetch(`${backendUrl}/chat`, {
         method: 'POST',
         headers: { 
@@ -93,8 +93,8 @@ export default function ChatInterface({ selectedLocations }) {
             <div
               className={`max-w-[80%] rounded-lg px-4 py-2 ${
                 message.role === 'user'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-600 text-gray-200'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-900'
               }`}
             >
               <ReactMarkdown className="text-sm whitespace-pre-wrap">
@@ -105,7 +105,7 @@ export default function ChatInterface({ selectedLocations }) {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-600 text-gray-200 rounded-lg px-4 py-2">
+            <div className="bg-gray-100 text-gray-900 rounded-lg px-4 py-2">
               <p className="text-sm">Thinking...</p>
             </div>
           </div>
@@ -118,16 +118,16 @@ export default function ChatInterface({ selectedLocations }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about your destinations..."
-          className="flex-1 p-2 rounded border border-gray-500 bg-gray-700 text-gray-100"
+          className="flex-1 p-2 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded-lg font-medium ${
             isLoading || !input.trim()
-              ? 'bg-gray-400 text-gray-200'
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors'
           }`}
         >
           Send

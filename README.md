@@ -1,4 +1,4 @@
-# HACKRUF24 - TripWhiz
+# TripWhiz (HackRU Fall 2024 Submission)
 
 ## How to Run
 
@@ -15,7 +15,6 @@ conda create --name tripwiz python=3.11
 conda activate tripwiz
 pip install -r requirements.txt
 ```
-
 
 Setup the frontend (will use the ```tripwiz``` directory):
 ```bash
