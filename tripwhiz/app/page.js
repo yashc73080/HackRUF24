@@ -263,12 +263,12 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Collapsible Left Panel - Now with floating appearance */}
+          {/* Collapsible Left Panel */}
           <div 
-            className={`absolute top-20 left-4 w-96 bg-white rounded-lg shadow-xl flex flex-col z-10 transition-all duration-300 ${
+            className={`absolute top-20 left-4 w-88 bg-white rounded-lg shadow-xl flex flex-col z-10 transition-all duration-300 ${
               isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
             }`}
-            style={{ height: 'calc(100% - 6rem)' }} // Adjusted to account for top and bottom margin
+            style={{ height: 'calc(100% - 6rem)' }}
           >
             <div className="p-4 border-b flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-900">Your Itinerary</h2>
@@ -352,7 +352,7 @@ export default function Page() {
 
           {/* Optimized Route Panel */}
           {optimizedRoute && (
-            <div className="absolute top-4 right-4 w-80 bg-white rounded-lg shadow-lg">
+            <div className="absolute top-20 right-4 w-80 bg-white rounded-lg shadow-lg">
               <div className="p-4">
                 <h3 className="font-semibold text-gray-900 mb-3">Optimized Route</h3>
                 <div className="space-y-2">
@@ -372,7 +372,7 @@ export default function Page() {
           {/* Chat Panel */}
           <div className="absolute bottom-4 right-4 flex flex-col items-end">
             {isChatOpen && (
-              <div className="mb-4 w-96 bg-white rounded-lg shadow-lg">
+              <div className="mb-4 w-88 bg-white rounded-lg shadow-lg">
                 <div className="h-96 flex flex-col">
                   <div className="p-4 border-b flex justify-between items-center">
                     <h2 className="font-semibold text-gray-900">TripWhiz AI Assistant</h2>
