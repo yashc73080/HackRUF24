@@ -143,12 +143,15 @@ def optimize_route():
 def chat():
     try:
         messages = request.json
-        
+        locations = request.args.get('locations')  # Extract locations from query parameters
+
         # System message for context
         system_message = {
             "role": "system",
-            "content": """You are TripWhiz AI, an AI travel assistant with advanced action-taking capabilities. 
-            Your primary goal is to help users plan and execute their travel itineraries seamlessly."""
+            "content": f"""You are TripWhiz AI, an AI travel assistant with advanced action-taking capabilities. 
+            Your primary goal is to help users plan and execute their travel itineraries seamlessly.
+            The current itinerary includes the following locations: {locations}.
+            """
         }
         
         # Add system message at the beginning
@@ -156,7 +159,7 @@ def chat():
         
         # Create chat completion with new API format
         response = client.chat.completions.create(
-            model="meta-llama/llama-3.1-8b-instruct:free",
+            model="meta-llama/llama-3.3-70b-instruct:free",
             messages=messages,
             stream=True
         )

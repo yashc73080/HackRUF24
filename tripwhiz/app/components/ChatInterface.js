@@ -27,7 +27,8 @@ export default function ChatInterface({ selectedLocations }) {
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
       console.log('Using backend URL:', backendUrl);
-      const response = await fetch(`${backendUrl}/chat`, {
+      const locationsString = selectedLocations.map(loc => loc.name).join(', '); // Create a string of location names
+      const response = await fetch(`${backendUrl}/chat?locations=${encodeURIComponent(locationsString)}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
